@@ -3,16 +3,15 @@ import { createSchema, createYoga } from 'graphql-yoga';
 
 // Custom types definition.
 
-/**1. Create a Post type
- * 2. Add id, title, body, and publicashed to the Post type (all non-nullable)
- * 3. Define a "post" query that returns a single post
- * 4. Set up the resolver method to return some post data
- * 5. Test out the query
+/**1. Create an add query that returns a float
+ * 2. Setup add to take two arguments (a, b) which are required floats
+ * 3. Have the resolver send back the sum of the two arguments
  */
 
 // Type definitions (Schema)
 const typeDefs = /* GraphQL */ `
 type Query{
+add(a: Float!, b: Float!): Float!
 greeting(name: String): String!
 me: User!
 post: Post!
@@ -34,7 +33,10 @@ type User{
 
 //Resolve API
 const resolvers = {
-    Query:{
+    Query: {
+        add(parent, args, ctx, info) {
+            return args.a + args.b;
+        },
         greeting(parent, args, ctx, info){
             if(args.name){
                 return `Hello ${args.name}!`;
