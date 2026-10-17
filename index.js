@@ -1,18 +1,13 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 
-// Custom types definition.
-
-/**1. Create an add query that returns a float
- * 2. Setup add to take two arguments (a, b) which are required floats
- * 3. Have the resolver send back the sum of the two arguments
- */
-
+// Arrays
 // Type definitions (Schema)
 const typeDefs = /* GraphQL */ `
 type Query{
 add(a: Float!, b: Float!): Float!
 greeting(name: String): String!
+grades: [Int!]!
 me: User!
 post: Post!
 }
@@ -44,6 +39,9 @@ const resolvers = {
                 return `Hello!`;
             }
         },
+        grades(parent, args, ctx, info){
+            return [99, 80, 93];
+        }, 
         me(){
             return{
                 id: '123-abc',
