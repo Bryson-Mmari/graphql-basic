@@ -13,6 +13,7 @@ import { createSchema, createYoga } from 'graphql-yoga';
 // Type definitions (Schema)
 const typeDefs = /* GraphQL */ `
 type Query{
+greeting(name: String): String!
 me: User!
 post: Post!
 }
@@ -34,6 +35,13 @@ type User{
 //Resolve API
 const resolvers = {
     Query:{
+        greeting(parent, args, ctx, info){
+            if(args.name){
+                return `Hello ${args.name}!`;
+            }else{
+                return `Hello!`;
+            }
+        },
         me(){
             return{
                 id: '123-abc',
