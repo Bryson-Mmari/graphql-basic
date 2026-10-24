@@ -12,18 +12,22 @@ const comments = [
     {
         id: "101",
         text: "Congratulations on the Bivio release!.",
+        owner: "1"
     },
     {
         id: "102",
         text: "Looking forward to the next update.",
+        owner: "2"
     },
     {
         id: "103",
         text: "These modifications look promising!",
+        owner: "1"
     },
     {
         id: "104",
         text: "This is the fourth comment.",
+        owner: "3"
     },
 ];
 
@@ -94,11 +98,13 @@ type User{
     email: String!
     age: Int,
     posts: [Post!]!
+    comments: [Comment!]!
 }
 
 type Comment{
     id: ID!
     text: String!
+    owner: User!
 }
 `;
 
@@ -108,7 +114,7 @@ const resolvers = {
         comments(parent, args, ctx, info){
             return comments;
         },
-        
+
         users(parent, args, ctx, info){
             if(!args.query){
             return users;
@@ -183,9 +189,18 @@ const resolvers = {
             return posts.filter((post) => {
                 return post.author === parent.id;
             });
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter((comment) => {
+                return comment.owner === parent.id;
+            });
         }
-    }
-
+    },
+    Comment: {
+        owner(parent, args, ctx, info) {
+            return users.find((user) => user.id === parent.owner);
+        },
+    },
 
 };
 
