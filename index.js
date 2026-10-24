@@ -1,14 +1,32 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 /**
- * My Challenge
- * 1. Set up an array of three posts with dummy post data (id, title, body, published)
- * 2. Set up a "posts" query and receiver that rertuns all the posts
- * 3. Test the query out
- * 4. Add a query argument that only return posts that contains that query string in the title or body
- * 5. Run a few sample queries searching for posts with a specific title
+ * Challenge part 1
+ * 1. Set up a comment type with id and text fields. Both non-nullable.
+ * 2. Set up a comment array with 4 comments
+ * 3. Set up a comment query with a resolver that returns all comments
+ * 4.Run a query to get all 4 comments with both id and text fields.
  */
-// Demo users Data
+ 
+const comments = [
+    {
+        id: "101",
+        text: "Congratulations on the Bivio release!.",
+    },
+    {
+        id: "102",
+        text: "Looking forward to the next update.",
+    },
+    {
+        id: "103",
+        text: "These modifications look promising!",
+    },
+    {
+        id: "104",
+        text: "This is the fourth comment.",
+    },
+];
+
 const users = [
     {
         id: "1",
@@ -57,6 +75,7 @@ const typeDefs = /* GraphQL */ `
 type Query{
 users(query: String): [User!]!
 posts(qry: String): [Post!]!
+comments: [Comment!]!
 me: User!
 post: Post!
 }
@@ -75,11 +94,21 @@ type User{
     email: String!
     age: Int,
     posts: [Post!]!
-}`;
+}
+
+type Comment{
+    id: ID!
+    text: String!
+}
+`;
 
 //Resolve API
 const resolvers = {
     Query: {
+        comments(parent, args, ctx, info){
+            return comments;
+        },
+        
         users(parent, args, ctx, info){
             if(!args.query){
             return users;
