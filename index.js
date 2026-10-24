@@ -24,7 +24,7 @@ const users = [
 ];
 const typeDefs = /* GraphQL */ `
 type Query{
-users: [User!]!
+users(query: String): [User!]!
 me: User!
 post: Post!
 }
@@ -47,7 +47,12 @@ type User{
 const resolvers = {
     Query: {
         users(parent, args, ctx, info){
+            if(!args.query){
             return users;
+            }
+            return users.filter((user) =>{
+                return user.name.toLocaleLowerCase().includes(args.query.toLocaleLowerCase());
+            });
         }, 
         me(){
             return{
