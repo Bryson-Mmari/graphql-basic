@@ -5,7 +5,7 @@ import { createSchema, createYoga } from 'graphql-yoga';
 // Type definitions (Schema)
 const typeDefs = /* GraphQL */ `
 type Query{
-add(a: Float!, b: Float!): Float!
+add(numbers: [Float!]!): Float!
 greeting(name: String): String!
 grades: [Int!]!
 me: User!
@@ -30,7 +30,13 @@ type User{
 const resolvers = {
     Query: {
         add(parent, args, ctx, info) {
-            return args.a + args.b;
+            if(args.numbers.length === 0){
+                return 0;
+            }
+            return args.numbers.reduce(
+                (accumulator, currentValue) => accumulator + currentValue,
+                0,
+            );
         },
         greeting(parent, args, ctx, info){
             if(args.name){
