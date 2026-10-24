@@ -1,12 +1,16 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 /**
- * Challenge part 1
+ * Challenge part 2
  * 1. Set up a comment type with id and text fields. Both non-nullable.
  * 2. Set up a comment array with 4 comments
  * 3. Set up a comment query with a resolver that returns all comments
- * 4.Run a query to get all 4 comments with both id and text fields.
- */
+ * 4. Run a query to get all 4 comments with both id and text fields.
+ * 5. Create a relationship between comments and users. Each comment should have an owner field that is a user type. 
+ * 6. Run a query to get all comments with the id, text, and owner fields. The owner field should return the id and name of the user.
+ * 7. Run a query to get all users with the id, name, and comments fields. The comments field should return the id and text of each comment.
+ * 
+ * */
  
 const comments = [
     {
