@@ -1,6 +1,13 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
-
+/**
+ * My Challenge
+ * 1. Set up an array of three posts with dummy post data (id, title, body, published)
+ * 2. Set up a "posts" query and receiver that rertuns all the posts
+ * 3. Test the query out
+ * 4. Add a query argument that only return posts that contains that query string in the title or body
+ * 5. Run a few sample queries searching for posts with a specific title
+ */
 // Demo users Data
 const users = [
     {
@@ -22,9 +29,31 @@ const users = [
         age: 26,
     },
 ];
+
+const posts = [
+    {
+        id: "1",
+        title: "Bivio Release",
+        body: "Released on June 2026!",
+        published: true,
+    },
+    {
+        id: "2",
+        title: "Respad 6",
+        body: "6 Months to go! Stay Alert!!",
+        published: false,
+    },
+    {
+        id: "3",
+        title: "Spear Modifications",
+        body: "Coming Soon!! Stay tuned!",
+        published: true,
+    },
+];
 const typeDefs = /* GraphQL */ `
 type Query{
 users(query: String): [User!]!
+posts(qry: String): [Post!]!
 me: User!
 post: Post!
 }
@@ -53,6 +82,20 @@ const resolvers = {
             return users.filter((user) =>{
                 return user.name.toLocaleLowerCase().includes(args.query.toLocaleLowerCase());
             });
+        }, 
+        posts(parent, args, ctx, info){
+            let result = posts.filter((post)=> post.published === true);
+
+            if(!args.qry){
+            return posts;
+            }
+            // return posts.filter((post) =>{
+            //     return post.title.toLowerCase().includes(args.qry.toLowerCase());
+            // });
+            result = result.filter((post) =>
+                post.title.toLowerCase().includes(args.qry.toLowerCase()))
+            return result;
+
         }, 
         me(){
             return{
