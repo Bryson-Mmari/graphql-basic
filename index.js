@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 /**
- * Challenge part 2
+ * Challenge part 3
  * 1. Set up a comment type with id and text fields. Both non-nullable.
  * 2. Set up a comment array with 4 comments
  * 3. Set up a comment query with a resolver that returns all comments
@@ -9,29 +9,34 @@ import { createSchema, createYoga } from 'graphql-yoga';
  * 5. Create a relationship between comments and users. Each comment should have an owner field that is a user type. 
  * 6. Run a query to get all comments with the id, text, and owner fields. The owner field should return the id and name of the user.
  * 7. Run a query to get all users with the id, name, and comments fields. The comments field should return the id and text of each comment.
- * 
+ * 8. Create a relationship between comments and posts. Each comment should have a post field that is a post type.
+ * 9. Run a query to get all comments with the id, text, owner, and post fields. The post field should return the id and title of the post.
  * */
  
 const comments = [
     {
         id: "101",
         text: "Congratulations on the Bivio release!.",
-        owner: "1"
+        owner: "1",
+        post: "11"
     },
     {
         id: "102",
         text: "Looking forward to the next update.",
-        owner: "2"
+        owner: "2",
+        post: "12"
     },
     {
         id: "103",
         text: "These modifications look promising!",
-        owner: "1"
+        owner: "1",
+        post: "13"
     },
     {
         id: "104",
         text: "This is the fourth comment.",
-        owner: "3"
+        owner: "3",
+        post: "11"
     },
 ];
 
@@ -72,7 +77,7 @@ const posts = [
         author: "2",
     },
     {
-        id: "3",
+        id: "13",
         title: "Spear Modifications",
         body: "Coming Soon!! Stay tuned!",
         published: true,
@@ -94,6 +99,7 @@ type Post{
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
 }
 
 type User{
@@ -109,6 +115,7 @@ type Comment{
     id: ID!
     text: String!
     owner: User!
+    post: Post!
 }
 `;
 
@@ -181,11 +188,16 @@ const resolvers = {
         },
     },
     Post:{
-           author(parent, args, ctx, info){
+        author(parent, args, ctx, info){
             return users.find((user) => {
                 return user.id === parent.author
             })
-           }
+        },
+        comments(parent, args, ctx, info){
+            return comments.filter((comment) => {
+                return comment.post === parent.id;
+            });
+        }
     },
     
     User: {
@@ -204,6 +216,9 @@ const resolvers = {
         owner(parent, args, ctx, info) {
             return users.find((user) => user.id === parent.owner);
         },
+        post(parent, args, ctx, info) {
+            return posts.find((post) => post.id === parent.post);
+        }
     },
 
 };
