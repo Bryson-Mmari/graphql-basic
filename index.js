@@ -1,14 +1,45 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 /**
- * My Challenge
- * 1. Set up an array of three posts with dummy post data (id, title, body, published)
- * 2. Set up a "posts" query and receiver that rertuns all the posts
- * 3. Test the query out
- * 4. Add a query argument that only return posts that contains that query string in the title or body
- * 5. Run a few sample queries searching for posts with a specific title
- */
-// Demo users Data
+ * Challenge part 3
+ * 1. Set up a comment type with id and text fields. Both non-nullable.
+ * 2. Set up a comment array with 4 comments
+ * 3. Set up a comment query with a resolver that returns all comments
+ * 4. Run a query to get all 4 comments with both id and text fields.
+ * 5. Create a relationship between comments and users. Each comment should have an owner field that is a user type. 
+ * 6. Run a query to get all comments with the id, text, and owner fields. The owner field should return the id and name of the user.
+ * 7. Run a query to get all users with the id, name, and comments fields. The comments field should return the id and text of each comment.
+ * 8. Create a relationship between comments and posts. Each comment should have a post field that is a post type.
+ * 9. Run a query to get all comments with the id, text, owner, and post fields. The post field should return the id and title of the post.
+ * */
+ 
+const comments = [
+    {
+        id: "101",
+        text: "Congratulations on the Bivio release!.",
+        owner: "1",
+        post: "11"
+    },
+    {
+        id: "102",
+        text: "Looking forward to the next update.",
+        owner: "2",
+        post: "12"
+    },
+    {
+        id: "103",
+        text: "These modifications look promising!",
+        owner: "1",
+        post: "13"
+    },
+    {
+        id: "104",
+        text: "This is the fourth comment.",
+        owner: "3",
+        post: "11"
+    },
+];
+
 const users = [
     {
         id: "1",
@@ -46,7 +77,7 @@ const posts = [
         author: "2",
     },
     {
-        id: "3",
+        id: "13",
         title: "Spear Modifications",
         body: "Coming Soon!! Stay tuned!",
         published: true,
@@ -57,6 +88,7 @@ const typeDefs = /* GraphQL */ `
 type Query{
 users(query: String): [User!]!
 posts(qry: String): [Post!]!
+comments: [Comment!]!
 me: User!
 post: Post!
 }
@@ -67,6 +99,7 @@ type Post{
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
 }
 
 type User{
@@ -75,11 +108,24 @@ type User{
     email: String!
     age: Int,
     posts: [Post!]!
-}`;
+    comments: [Comment!]!
+}
+
+type Comment{
+    id: ID!
+    text: String!
+    owner: User!
+    post: Post!
+}
+`;
 
 //Resolve API
 const resolvers = {
     Query: {
+        comments(parent, args, ctx, info){
+            return comments;
+        },
+
         users(parent, args, ctx, info){
             if(!args.query){
             return users;
@@ -142,11 +188,16 @@ const resolvers = {
         },
     },
     Post:{
-           author(parent, args, ctx, info){
+        author(parent, args, ctx, info){
             return users.find((user) => {
                 return user.id === parent.author
             })
-           }
+        },
+        comments(parent, args, ctx, info){
+            return comments.filter((comment) => {
+                return comment.post === parent.id;
+            });
+        }
     },
     
     User: {
@@ -154,9 +205,21 @@ const resolvers = {
             return posts.filter((post) => {
                 return post.author === parent.id;
             });
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter((comment) => {
+                return comment.owner === parent.id;
+            });
         }
-    }
-
+    },
+    Comment: {
+        owner(parent, args, ctx, info) {
+            return users.find((user) => user.id === parent.owner);
+        },
+        post(parent, args, ctx, info) {
+            return posts.find((post) => post.id === parent.post);
+        }
+    },
 
 };
 
